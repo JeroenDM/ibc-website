@@ -82,7 +82,9 @@ var plotModule = (function () {
 var dataModule = (function() {
   // initialize data acces
   var path = "/data/";
-  var fileNames = ["test1.txt", "test2.txt"];
+  //var fileNames = ["test1.txt", "test2.txt"];
+  var fileNames = [];
+  var dummy = document.createElement( 'html' );
 
   d3.tsv(path + fileNames[0], plotModule.update);
 
@@ -95,9 +97,29 @@ var dataModule = (function() {
     return fileNames;
   }
 
+  function searchFileNames() {
+
+    function reqListener () {
+      //console.log(this.responseText);
+      dummy.innerHTML = this.responseText;
+      var list = dummy.getElementsByTagName("a");
+      fileNames = [];
+      for(i=1; i<list.length;i++){
+        fileNames.push(list[i].innerHTML.trim());
+      }
+    }
+
+    var oReq = new XMLHttpRequest();
+    oReq.addEventListener('load', reqListener);
+    oReq.open("get", "/data", true);
+    oReq.send();
+  }
+
   return {
     update: updatePlot,
-    getFileNames: getFileNames
+    getFileNames: getFileNames,
+    test: searchFileNames,
+    raw: dummy
   }
 })();
 
