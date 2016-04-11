@@ -2,12 +2,14 @@
 
 plotModule.create();
 
-formModule.updateYVars();
+var header = ["koppel", "stroom"];
+var labels = ["Torque", "Current"];
+
+formModule.updateYVars(labels, header);
 
 // Add events
 events.on("update", function() {
+  formModule.updateFileList(dataModule.fileNames);
   dataModule.update();
-});
-events.on("update", function() {
   console.log("Plot up to date!");
 });

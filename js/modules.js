@@ -24,8 +24,9 @@ var plotModule = (function () {
 
   // Public functions
   function createPlot() {
+
     // initial data on plot
-    var data = [{tijd: 0, snelheid: 0}];
+    var data = dataModule.initData;
 
     x.domain(d3.extent(data, function(d) { return +d.tijd; }));
     y.domain(d3.extent(data, function(d) { return +d.snelheid; }));
@@ -80,26 +81,24 @@ var plotModule = (function () {
 })();
 
 var dataModule = (function() {
+
   // initialize data acces
   var path = "/data/";
-  //var fileNames = ["test1.txt", "test2.txt"];
-  var fileNames = [];
-  var dummy = document.createElement( 'html' );
-  fileNames = searchFileNames();
+  var fileNames = []; //["test1.txt", "test2.txt"];
+  var dummy = document.createElement( 'html' ); // for XMLHttpRequest return
 
-  function updatePlot() {
+  // initialize fileNames (one time, on page load)
+  searchFileNames();
+
+  // event function when file selection menu onchange
+  function updatePlotData() {
       var name = document.getElementById("fileSelection").value;
       d3.tsv(path + name, plotModule.update);
-  }
-
-  function getFileNames() {
-    return fileNames;
   }
 
   function searchFileNames() {
 
     function reqListener () {
-      //console.log(this.responseText);
       dummy.innerHTML = this.responseText;
       var list = dummy.getElementsByTagName("a");
       fileNames = [];
@@ -109,8 +108,10 @@ var dataModule = (function() {
           fileNames.push(name);
         }
       }
-      d3.tsv(path + fileNames[0], plotModule.update);
-      formModule.updateFileList();
+      // move this funtions to evetn handler
+      events.emit("update");
+      //d3.tsv(path + fileNames[0], plotModule.update);
+      //formModule.updateFileList();
     }
 
     var oReq = new XMLHttpRequest();
@@ -120,32 +121,33 @@ var dataModule = (function() {
   }
 
   return {
-    update: updatePlot,
-    getFileNames: getFileNames,
+    update: updatePlotData,
     test: searchFileNames,
-    raw: dummy
+    fileNames: fileNames,
+    initData: [{tijd: 0, snelheid: 0}]
   }
 })();
 
 var formModule = (function() {
 
-  var header = ["koppel", "stroom"];
-  var labels = ["Torque", "Current"];
-  var $div = d3.select("#yVarSelection");
+  // DOM shortcuts
+  var $yVar = d3.select("#yVarSelection");
+  var $files = d3.select("#fileSelection");
 
-  function updateFileList() {
-    var fileNames = dataModule.getFileNames();
-    var $select = d3.select("#fileSelection");
+  function updateFileList(fileNames) {
     for (i=0; i < fileNames.length; i++) {
-      $select.append("option")
+      // TODO replace with d3 data functionality
+      $files.append("option")
               .attr("value", fileNames[i])
               .text(fileNames[i]);
     }
   }
+
   // some realy ugly dom handling
-  function updateYVars() {
+  function updateYVars(labels, headers) {
     for (i=0; i<labels.length; i++) {
-      var $label = $div.append("div")
+      // TODO replace with d3 data functionality
+      var $label = $yVar.append("div")
                     .attr("class", "radio")
                     .append("label")
       $label.append("input")
@@ -154,7 +156,6 @@ var formModule = (function() {
             .attr("value", header[i])
       $label.append("p").text(labels[i]);
     }
-
   }
 
   return {
