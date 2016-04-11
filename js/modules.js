@@ -85,8 +85,7 @@ var dataModule = (function() {
   //var fileNames = ["test1.txt", "test2.txt"];
   var fileNames = [];
   var dummy = document.createElement( 'html' );
-
-  d3.tsv(path + fileNames[0], plotModule.update);
+  fileNames = searchFileNames();
 
   function updatePlot() {
       var name = document.getElementById("fileSelection").value;
@@ -104,9 +103,14 @@ var dataModule = (function() {
       dummy.innerHTML = this.responseText;
       var list = dummy.getElementsByTagName("a");
       fileNames = [];
-      for(i=1; i<list.length;i++){
-        fileNames.push(list[i].innerHTML.trim());
+      for(i=0; i<list.length;i++){
+        var name = list[i].innerHTML.trim();
+        if (name.slice(-3) == "txt") {
+          fileNames.push(name);
+        }
       }
+      d3.tsv(path + fileNames[0], plotModule.update);
+      formModule.updateFileList();
     }
 
     var oReq = new XMLHttpRequest();
@@ -125,20 +129,19 @@ var dataModule = (function() {
 
 var formModule = (function() {
 
-  // Init file selection menu
-  var fileNames = dataModule.getFileNames();
-
-  var $select = d3.select("#fileSelection");
-  for (i=0; i < fileNames.length; i++) {
-    $select.append("option")
-            .attr("value", fileNames[i])
-            .text(fileNames[i]);
-  }
-
   var header = ["koppel", "stroom"];
   var labels = ["Torque", "Current"];
   var $div = d3.select("#yVarSelection");
 
+  function updateFileList() {
+    var fileNames = dataModule.getFileNames();
+    var $select = d3.select("#fileSelection");
+    for (i=0; i < fileNames.length; i++) {
+      $select.append("option")
+              .attr("value", fileNames[i])
+              .text(fileNames[i]);
+    }
+  }
   // some realy ugly dom handling
   function updateYVars() {
     for (i=0; i<labels.length; i++) {
@@ -155,6 +158,7 @@ var formModule = (function() {
   }
 
   return {
-    updateYVars: updateYVars
+    updateYVars: updateYVars,
+    updateFileList: updateFileList
   }
 })();
