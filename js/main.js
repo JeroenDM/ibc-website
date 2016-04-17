@@ -1,6 +1,6 @@
 
 
-plotModule.create();
+plotModule2.init();
 
 formModule.updateYVars();
 
