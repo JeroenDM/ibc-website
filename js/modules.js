@@ -155,6 +155,7 @@ var dataModule = (function() {
 	// initialize data acces
 	var path = "/data/";
 	var fileNames = [];
+	var currentData;
 	
 	
 	fileNames = _readFileNames();
@@ -174,6 +175,11 @@ var dataModule = (function() {
 		  });
 		}
 		plotModule2.update(plotData);
+	}
+	
+	function _processData(data) {
+		currentData = data;
+		_selectXYAndPlot(data);
 	}
 
 	function _readFileNames() {
@@ -215,7 +221,7 @@ var dataModule = (function() {
 		if (name === "") {
 			alert("Please select an input file.");
 		} else {
-			d3.tsv(path + name, _selectXYAndPlot);
+			d3.tsv(path + name, _processData);
 		}
 	}
 	
@@ -226,12 +232,17 @@ var dataModule = (function() {
 	function getVarNames() {
 		return varNames;
 	}
+	
+	function getCurrentData() {
+		return currentData;
+	}
 
 	return {
 	update: update,
 	getFileNames: getFileNames,
 	updateYVar: updateYVar,
-	getVarNames: getVarNames
+	getVarNames: getVarNames,
+	getCurrentData: getCurrentData
 	};
 })();
 
@@ -287,4 +298,38 @@ var formModule = (function() {
 
 summaryModule = (function() {
 	
+	function update() {
+		var result = _calculateSummary();
+		
+		document.getElementById("averageSpeed").innerHTML = result.averageSpeed + " km/h";
+		document.getElementById("averageCadence").innerHTML = result.averageCadence + " rpm";
+		console.log("summary updated");
+	}
+	
+	function _calculateSummary() {
+		var result = {
+			averageSpeed: 0,
+			averageCadence: 0
+		};
+		
+		var data = dataModule.getCurrentData();
+		if (!data) console.log("summaryModule: No data in data" + data.length);
+		var len = data.length;
+		
+		var tempSpeed = 0;
+		var tempCadence = 0;
+		for (var i=0; i<len;i++) {
+			tempSpeed += +data[i].snelheid;
+			tempCadence += +data[i].kadans;
+		}
+		
+		result.averageSpeed = tempSpeed / len;
+		result.averageCadence = tempCadence / len;
+		
+		return result;
+	}
+	
+	return {
+		update: update
+	};
 })();
