@@ -67,8 +67,7 @@ var plotModule2 = (function() {
 	return {
 		init: init,
 		update: update
-	}
-	
+	};
 })();
 
 /* var plotModule = (function () {
@@ -168,12 +167,12 @@ var dataModule = (function() {
 	function _selectXYAndPlot(data) {
 		var plotData = [];
 
-		for (i=0; i<data.length; i++) {
+		for (var i=0; i<data.length; i++) {
 		  plotData.push({
 			  x: data[i][xVar],
 			  y: data[i][yVar]
 		  });
-		};
+		}
 		plotModule2.update(plotData);
 	}
 
@@ -186,7 +185,7 @@ var dataModule = (function() {
 			dummy.innerHTML = this.responseText;
 			var list = dummy.getElementsByTagName("a");
 			fileNames = [];
-			for(i=0; i<list.length;i++){
+			for(var i=0; i<list.length;i++){
 				var name = list[i].innerHTML.trim();
 				if (name.slice(-3) == "txt") {
 					fileNames.push(name);
@@ -213,7 +212,7 @@ var dataModule = (function() {
 		
 		// updata plot data
 		var name = document.getElementById("fileSelection").value;
-		if (name == "") {
+		if (name === "") {
 			alert("Please select an input file.");
 		} else {
 			d3.tsv(path + name, _selectXYAndPlot);
@@ -233,13 +232,10 @@ var dataModule = (function() {
 	getFileNames: getFileNames,
 	updateYVar: updateYVar,
 	getVarNames: getVarNames
-	}
+	};
 })();
 
 var formModule = (function() {
-
-	var header = ["koppel", "stroom"];
-	var labels = ["Torque", "Current"];
 	var $div = d3.select("#yVarSelection");
 	var $select = d3.select("#fileSelection");
 
@@ -253,7 +249,7 @@ var formModule = (function() {
 				.attr("value", function(d) {return d;})
 				.text(function(d) {return d;});
 /* 		var $select = d3.select("#fileSelection");
-		for (i=0; i < fileNames.length; i++) {
+		for (var var i=0; i < fileNames.length; i++) {
 			$select.append("option")
 				  .attr("value", fileNames[i])
 				  .text(fileNames[i]);
@@ -286,5 +282,9 @@ var formModule = (function() {
     updateYVars: updateYVars,
     updateFileList: updateFileList,
 	getCheckedYVar: getCheckedYVar
-  }
+  };
+})();
+
+summaryModule = (function() {
+	
 })();
